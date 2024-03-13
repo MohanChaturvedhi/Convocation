@@ -53,6 +53,11 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  max-width: calc(100% - 20px); /* Adjust according to your layout */
+  max-height: calc(100% - 20px); /* Adjust according to your layout */
+  overflow: auto;
+  margin-top: 10px; /* Add margin */
+  margin:50px;
 }
 
 .popup table {
@@ -78,9 +83,9 @@ h1 {
 }
 
 .popup button.confirm {
-  background-color: green; /* Set background color for confirm button */
+  background-color: rgb(59, 158, 59); /* Set background color for confirm button */
 }
 
 .popup button.cancel {
-  background-color: rgb(246, 47, 47); /* Set background color for cancel button */
+  background-color: rgb(227, 71, 71); /* Set background color for cancel button */
 }

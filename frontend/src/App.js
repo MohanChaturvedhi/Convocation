@@ -88,38 +88,40 @@ const FileInput = () => {
       {selectedFile && <button onClick={handleParsePreview}>Preview CSV</button>}
 
       {showTable && parsedData && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Data Preview</h3>
-            <table border="1">
-              <thead>
-                <tr>
-                  {Object.keys(parsedData[0]).map((key) => (
-                    <th key={key}>{key}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {parsedData.map((row, index) => (
-                  <tr key={index}>
-                    {Object.values(row).map((value, i) => (
-                      <td key={i}>{value}</td>
-                    ))}
-                  </tr>
+  <div className="popup">
+    <div className="popup-content">
+      <h3>Data Preview</h3>
+      <div className="table-container"> {/* Add this container */}
+        <table>
+          <thead>
+            <tr>
+              {Object.keys(parsedData[0]).map((key) => (
+                <th key={key}>{key}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {parsedData.map((row, index) => (
+              <tr key={index}>
+                {Object.values(row).map((value, i) => (
+                  <td key={i}>{value}</td>
                 ))}
-              </tbody>
-            </table>
-            <div>
-              <button className="confirm" onClick={handleSubmit}>
-                Confirm
-              </button>
-              <button className="cancel" onClick={handleCancel}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <button className="confirm" onClick={handleSubmit}>
+          Confirm
+        </button>
+        <button className="cancel" onClick={handleCancel}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
