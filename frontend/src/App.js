@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import './App.css';
+import axios from 'axios';
 
 const FileInput = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -40,28 +41,45 @@ const FileInput = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('YOUR_BACKEND_API_ENDPOINT', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: parsedData }),
-      });
+  // const handleSubmit = async () => {
+  //   try {
+  //     const response = await fetch('YOUR_BACKEND_API_ENDPOINT', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ data: parsedData }),
+  //     });
 
-      if (response.ok) {
-        console.log('Data successfully submitted to the backend.');
-      } else {
-        console.error('Failed to submit data to the backend.');
-      }
-    } catch (error) {
-      console.error('Error:', error.message);
+  //     if (response.ok) {
+  //       console.log('Data successfully submitted to the backend.');
+  //     } else {
+  //       console.error('Failed to submit data to the backend.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error.message);
+  //   }
+  // };
+
+  const handleSubmit = async () => {
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/upload-csv', {
+     parsedData
+    });
+
+    if (response.status==200) {
+      console.log('Data successfully submitted to the backend.');
+    } else {
+      console.error('Failed to submit data to the backend.');
     }
-  };
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+};
 
   const handleCancel = () => {
     setSelectedFile(null);
+    console.log('Found Errors? Upload Again');
     setParsedData(null);
     setShowTable(false);
     setInputKey((prevKey) => prevKey + 1); // Increment the key to force re-render
