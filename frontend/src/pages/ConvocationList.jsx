@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { data } from './data.js'; // Mock data for development (optional)
 import './ConvocationList.css';
 
@@ -34,8 +34,12 @@ export default function ConvocationList() {
       temp.sort((a, b) => {
         const dateA = a.Date.split("-");
         const dateB = b.Date.split("-");
-        if (dateA[1] !== dateB[1]) return (dateA[1] - dateB[1]);
-        if (dateA[0] !== dateB[0]) return (dateA[0] - dateB[0]);
+        const yearComparison = dateA[0] - dateB[0];
+        if (yearComparison !== 0) {
+          return yearComparison;
+        } else {
+          return dateA[1] - dateB[1];
+        }
       });
     } else {
       temp.sort((a, b) => a.cgpa - b.cgpa);
