@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 // import axios from 'axios';
 import { data } from './data.js'; // Mock data for development (optional)
-import './ConvocationList.css';
 
 export default function ConvocationList() {
   const [sessionYear, setSessionYear] = useState('2016-2017');
@@ -89,6 +88,7 @@ export default function ConvocationList() {
           <input type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} />
           <div>
             <div>
+            {filteredMembers.length > 0 ? (
               <table className="table">
                 <thead>
                   <tr>
@@ -107,6 +107,9 @@ export default function ConvocationList() {
                   ))}
                 </tbody>
               </table>
+            ) : (
+              <p>No data found</p>
+            )}
             </div>
 
           </div>
