@@ -7,6 +7,7 @@ export default function ConvocationList() {
   const [convocationMembers, setConvocationMembers] = useState([]);
   const [flag, setFlag] = useState(false);
   const [sort, setSort] = useState('name');
+  const [order, setOrder] = useState('asc');
   const [searchItem, setSearchItem] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -21,22 +22,22 @@ export default function ConvocationList() {
     e.preventDefault();
     let temp = [...convocationMembers];
     if (sort === 'name') {
-      temp.sort((a, b) => a.name.localeCompare(b.name));
+      temp.sort((a, b) => order === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
     } else if (sort === 'branch') {
-      temp.sort((a, b) => a.branch.localeCompare(b.branch));
+      temp.sort((a, b) => order === 'asc' ? a.branch.localeCompare(b.branch) : b.branch.localeCompare(a.branch));
     } else if (sort === 'Date') {
       temp.sort((a, b) => {
         const dateA = a.Date.split("-");
         const dateB = b.Date.split("-");
         const yearComparison = dateA[0] - dateB[0];
         if (yearComparison !== 0) {
-          return yearComparison;
+          return order === 'asc' ? yearComparison : -yearComparison;
         } else {
-          return dateA[1] - dateB[1];
+          return order === 'asc' ? dateA[1] - dateB[1] : dateB[1] - dateA[1];
         }
       });
     } else {
-      temp.sort((a, b) => a.cgpa - b.cgpa);
+      temp.sort((a, b) => order === 'asc' ? a.cgpa - b.cgpa : b.cgpa - a.cgpa);
     }
     setConvocationMembers(temp);
   };
@@ -47,6 +48,10 @@ export default function ConvocationList() {
 
   const handlePagination = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleOrderChange = (e) => {
+    setOrder(e.target.value);
   };
 
   const filteredMembers = convocationMembers.filter((member) => {
@@ -62,14 +67,31 @@ export default function ConvocationList() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredMembers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+
+  const paginationItems = [];
+
+  if (totalPages <= 5) {
+    for (let i = 1; i <= totalPages; i++) {
+      paginationItems.push(i);
+    }
+  } else {
+    if (currentPage <= 3) {
+      paginationItems.push(1, 2, 3, '...', totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      paginationItems.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      paginationItems.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+    }
+  }
 
   return (
-    <Box className="container" style={{ marginLeft: '320px' }}>
+    <Box className="container" style={{ marginLeft: '270px', marginRight:'15px' }}>
       <div className="container">
         <Box display="flex" flexDirection="column" alignItems="center">
           <Typography variant="h4" mb={2}>Session-year</Typography>
           <form onSubmit={Filehandler} className="form" style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem' }}>
+            <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem',height:'3rem' }}>
               <MenuItem value="2016-2017">2016-2017</MenuItem>
               <MenuItem value="2018-2019">2018-2019</MenuItem>
               <MenuItem value="2019-2020">2019-2020</MenuItem>
@@ -77,24 +99,28 @@ export default function ConvocationList() {
               <MenuItem value="2022-2023">2022-2023</MenuItem>
               <MenuItem value="2023-2024">2023-2024</MenuItem>
             </Select>
-            <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px' }}>Submit</Button>
+            <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', height:'3rem'}}>Submit</Button>
           </form>
         </Box>
         {flag && convocationMembers.length > 0 &&
           <Box mt={2} display="flex" alignItems="center">
             <form onSubmit={ApplyFilter} className="form">
-              <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px' }}>
+              <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', height:'3rem' }}>
                 <MenuItem value="cgpa" sx={{ fontSize: '1rem' }}>CGPA</MenuItem>
                 <MenuItem value="name" sx={{ fontSize: '1rem' }}>Name</MenuItem>
                 <MenuItem value="branch" sx={{ fontSize: '1rem' }}>Branch</MenuItem>
                 <MenuItem value="Date" sx={{ fontSize: '1rem' }}>Date</MenuItem>
               </Select>
-              <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', marginLeft: '8px' }}>Apply filter</Button>
+              <Select value={order} onChange={handleOrderChange} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', marginLeft: '8px' , height:'3rem'}}>
+                <MenuItem value="asc" sx={{ fontSize: '1rem' }}>Ascending</MenuItem>
+                <MenuItem value="desc" sx={{ fontSize: '1rem' }}>Descending</MenuItem>
+              </Select>
+              <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', marginLeft: '8px', height:'3rem' }}>Apply filter</Button>
             </form>
-            <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem' }} />
+            <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height:'3rem' }} />
           </Box>
         }
-        <Box mt={2} style={{ boxShadow: '0px 0px 10px rgba(0.1, 0.1, 0.1, 0.1)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' }}>
+        <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' ,overflowX:'auto'}}>
           {currentItems.length > 0 ? (
             <Table>
               <TableHead>
@@ -107,8 +133,8 @@ export default function ConvocationList() {
               <TableBody>
                 {currentItems.map((row, index) => (
                   <TableRow key={index}>
-                    {Object.values(row).map((value, i) => (
-                      <TableCell key={i}>{value}</TableCell>
+                    {Object.keys(currentItems[0]).map((key) => (
+                      <TableCell key={key}>{row[key] || '---'}</TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -120,9 +146,11 @@ export default function ConvocationList() {
         </Box>
         {filteredMembers.length > itemsPerPage && (
           <Box mt={2} display="flex" justifyContent="center">
-            {[...Array(Math.ceil(filteredMembers.length / itemsPerPage)).keys()].map((pageNumber) => (
-              <Button key={pageNumber} onClick={() => handlePagination(pageNumber + 1)} variant="outlined" sx={{ marginX: 1 }}>{pageNumber + 1}</Button>
+            <Button disabled={currentPage === 1} onClick={() => handlePagination(currentPage - 1)} sx={{ marginX: 1 }}>Previous</Button>
+            {paginationItems.map((item, index) => (
+              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1 }}>{item}</Button>
             ))}
+            <Button disabled={currentPage === totalPages} onClick={() => handlePagination(currentPage + 1)} sx={{ marginX: 1 }}>Next</Button>
           </Box>
         )}
       </div>

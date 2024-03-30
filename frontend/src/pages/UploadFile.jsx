@@ -69,7 +69,45 @@ const UploadFile = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = parsedData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = parsedData ? parsedData.slice(indexOfFirstItem, indexOfLastItem) : [];
+  const totalPages = parsedData ? Math.ceil(parsedData.length / itemsPerPage) : 0;
+
+ const renderPagination = () => {
+  const pages = [];
+  if (totalPages <= 5) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    if (currentPage <= 3) {
+      pages.push(1, 2, 3, '...', totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+    }
+  }
+
+  return (
+    <>
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Button disabled={currentPage === 1} onClick={() => handlePagination(currentPage - 1)} sx={{ marginX: 1 }}>Previous</Button>
+        {pages.map((page, index) => (
+          <Button
+            key={index}
+            onClick={() => handlePagination(page)}
+            variant="outlined"
+            sx={{ marginX: 1, color: currentPage === page ? 'primary.main' : 'text.primary', bgcolor: currentPage === page ? 'primary.light' : 'transparent' }}
+          >
+            {page}
+          </Button>
+        ))}
+        <Button disabled={currentPage === totalPages} onClick={() => handlePagination(currentPage + 1)} sx={{ marginX: 1 }}>Next</Button>
+      </Box>
+    </>
+  );
+};
+
 
   return (
     <Box className="container" style={{ position: 'absolute', left: '320px', right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
@@ -93,7 +131,7 @@ const UploadFile = () => {
       {showTable && parsedData && (
         <Box className="popup" display="flex" justifyContent="center" mt={2}>
           <Fade in={showTable} timeout={500}>
-            <Box className="popup-content" style={{ display: 'flex', flexDirection: 'column', overflowX: 'auto', background: '#fff', padding: '20px', width: '100%' }}>
+            <Box className="popup-content" style={{ display: 'flex', flexDirection: 'column', overflowX: 'auto', background: '#fff', padding: '20px', width: '100%', boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)' }}>
               <Typography variant="h5" gutterBottom>Data Preview</Typography>
               <Table style={{ flexGrow: 1, width: '100%' }}>
                 <TableHead>
@@ -113,19 +151,21 @@ const UploadFile = () => {
                   ))}
                 </TableBody>
               </Table>
-              <Box display="flex" justifyContent="center" mt={2}>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
-                  Confirm
-                </Button>
-                <Button variant="contained" color="error" onClick={handleCancel} style={{ marginLeft: '10px' }}>
-                  Cancel
-                </Button>
+              <Box display="flex" justifyContent="space-between" mt={2} alignItems="center">
+                <Box>
+                  <Button variant="contained" color="error" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </Box>
+                <Box>
+                  <Button variant="contained" color="success" onClick={handleSubmit}>
+                    Confirm
+                  </Button>
+                </Box>
               </Box>
-              {parsedData.length > itemsPerPage && (
+              {totalPages > 1 && (
                 <Box mt={2} display="flex" justifyContent="center">
-                  {[...Array(Math.ceil(parsedData.length / itemsPerPage)).keys()].map((pageNumber) => (
-                    <Button key={pageNumber} onClick={() => handlePagination(pageNumber + 1)} variant="outlined" sx={{ marginX: 1 }}>{pageNumber + 1}</Button>
-                  ))}
+                  {renderPagination()}
                 </Box>
               )}
             </Box>

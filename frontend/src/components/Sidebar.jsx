@@ -17,7 +17,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: isMobile ? '100%' : 300,
+        width: isMobile ? '100%' : 250,
         position: 'fixed',
         top: 0,
         left: 0,

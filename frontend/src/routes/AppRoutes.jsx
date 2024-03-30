@@ -8,12 +8,9 @@ import ConvocationList from '../pages/ConvocationList';
 
 const App = () => {
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>   
       <Sidebar sx={{ width: 300, flexShrink: 0 }} />
-     
       <Box sx={{ flexGrow: 1, overflow: 'auto', paddingLeft: 2 }}>
-        {/* Routes */}
         <Routes>
           <Route exact path="/" element={<Dashboard />} /> 
           <Route exact path="/upload" element={<UploadFile />} />
