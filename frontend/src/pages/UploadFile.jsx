@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import axios from 'axios';
-import { Typography, Button, Table, TableHead, TableBody, TableRow, TableCell, Box } from '@mui/material';
+import { Typography, Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Fade } from '@mui/material';
 
 const UploadFile = () => {
   const [selectedFile, setSelectedFile] = useState('');
   const [parsedData, setParsedData] = useState('');
   const [showTable, setShowTable] = useState('');
   const [inputKey, setInputKey] = useState(0);
-  // const [sidebarWidth, setSidebarWidth] = useState(320); // Set initial value to 320px
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   useEffect(() => {
-    // Reset key when component unmounts to avoid potential issues
     return () => setInputKey(0);
   }, []);
 
@@ -60,16 +60,26 @@ const UploadFile = () => {
     setSelectedFile(null);
     setParsedData(null);
     setShowTable(false);
-    setInputKey((prevKey) => prevKey + 1); // Increment the key to force re-render
+    setInputKey((prevKey) => prevKey + 1);
   };
 
-  return (
-    <Box className="container" style={{ position: 'absolute', left: '350px', right: '0', display: 'flex', flexDirection: 'column', }}>
-      <Typography variant="h3" align="center" gutterBottom>
-        Convocation
-      </Typography>
+  const handlePagination = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
-      <Box display="flex" justifyContent="center" alignItems="center">
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = parsedData.slice(indexOfFirstItem, indexOfLastItem);
+
+  return (
+    <Box className="container" style={{ position: 'absolute', left: '320px', right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
+      <Box style={{ background: '#3f51b5', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+        <Typography variant="h3" align="center" gutterBottom style={{ color: '#fff' }}>
+          Convocation
+        </Typography>
+      </Box>
+
+      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
         <Typography variant="h5">Select CSV File</Typography>
         <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} />
       </Box>
@@ -82,35 +92,44 @@ const UploadFile = () => {
 
       {showTable && parsedData && (
         <Box className="popup" display="flex" justifyContent="center" mt={2}>
-          <Box className="popup-content" style={{ display: 'flex', flexDirection: 'column',overflowX:'auto' }}>
-            <Typography variant="h5" gutterBottom>Data Preview</Typography>
-            <Table style={{ flexGrow: 1,width:'100%' }}>
-              <TableHead>
-                <TableRow>
-                  {Object.keys(parsedData[0]).map((key) => (
-                    <TableCell key={key}>{key}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {parsedData.map((row, index) => (
-                  <TableRow key={index}>
-                    {Object.values(row).map((value, i) => (
-                      <TableCell key={i}>{value}</TableCell>
+          <Fade in={showTable} timeout={500}>
+            <Box className="popup-content" style={{ display: 'flex', flexDirection: 'column', overflowX: 'auto', background: '#fff', padding: '20px', width: '100%' }}>
+              <Typography variant="h5" gutterBottom>Data Preview</Typography>
+              <Table style={{ flexGrow: 1, width: '100%' }}>
+                <TableHead>
+                  <TableRow>
+                    {Object.keys(parsedData[0]).map((key) => (
+                      <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem' }}>{key}</TableCell>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Box display="flex" justifyContent="center" mt={2}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
-                Confirm
-              </Button>
-              <Button variant="contained" color="error" onClick={handleCancel}>
-                Cancel
-              </Button>
+                </TableHead>
+                <TableBody>
+                  {currentItems.map((row, index) => (
+                    <TableRow key={index}>
+                      {Object.keys(parsedData[0]).map((key) => (
+                        <TableCell key={key}>{row[key] || ''}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Box display="flex" justifyContent="center" mt={2}>
+                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                  Confirm
+                </Button>
+                <Button variant="contained" color="error" onClick={handleCancel} style={{ marginLeft: '10px' }}>
+                  Cancel
+                </Button>
+              </Box>
+              {parsedData.length > itemsPerPage && (
+                <Box mt={2} display="flex" justifyContent="center">
+                  {[...Array(Math.ceil(parsedData.length / itemsPerPage)).keys()].map((pageNumber) => (
+                    <Button key={pageNumber} onClick={() => handlePagination(pageNumber + 1)} variant="outlined" sx={{ marginX: 1 }}>{pageNumber + 1}</Button>
+                  ))}
+                </Box>
+              )}
             </Box>
-          </Box>
+          </Fade>
         </Box>
       )}
     </Box>

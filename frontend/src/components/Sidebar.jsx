@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Box, List, ListItem, ListItemText, Divider, ListItemIcon } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Divider, ListItemIcon , useMediaQuery, useTheme } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ListIcon from '@mui/icons-material/List';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const Sidebar = () => {
   const [showDashboard, setShowDashboard] = useState(false);
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const toggleDashboard = () => {
     setShowDashboard(!showDashboard);
   };
@@ -15,7 +17,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: 300,
+        width: isMobile ? '100%' : 300,
         position: 'fixed',
         top: 0,
         left: 0,
@@ -28,24 +30,26 @@ const Sidebar = () => {
       }}
     >
       <List>
-        <ListItem button component={NavLink} to="/" exact>
-          <ListItemIcon><DashboardIcon /></ListItemIcon>
+        <ListItem button component={NavLink} to="/">
+          <ListItemIcon>
+          <MenuIcon fontSize="large" style={{ color: '#3f51b5' }} />
+          </ListItemIcon>
           <ListItemText primary="MIS" />
         </ListItem>
         <Divider />
         <ListItem button onClick={toggleDashboard}>
-          <ListItemIcon><DashboardIcon /></ListItemIcon>
+          <ListItemIcon><DashboardIcon style={{ color: '#ff5722' }} /></ListItemIcon>
           <ListItemText primary="Dashboard" />
           {showDashboard ? '➖' : '➕'}
         </ListItem>
         {showDashboard && (
           <>
             <ListItem button component={NavLink} to="/upload">
-              <ListItemIcon><UploadFileIcon /></ListItemIcon>
+              <ListItemIcon><UploadFileIcon style={{ color: '#f44336' }} /></ListItemIcon>
               <ListItemText primary="Upload" />
             </ListItem>
             <ListItem button component={NavLink} to="/convocationlist">
-              <ListItemIcon><ListIcon /></ListItemIcon>
+              <ListItemIcon><ListIcon style={{ color: '#4caf50' }} /></ListItemIcon>
               <ListItemText primary="ConvocationList" />
             </ListItem>
           </>
