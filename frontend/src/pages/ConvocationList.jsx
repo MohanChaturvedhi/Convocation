@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // import axios from 'axios';
 import { data } from './data.js'; // Mock data for development (optional)
+import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box ,MenuItem} from '@mui/material';
 
 export default function ConvocationList() {
   const [sessionYear, setSessionYear] = useState('2016-2017');
@@ -15,6 +16,7 @@ export default function ConvocationList() {
     //   const response = await axios.post('http://localhost:8000/convocationlist', {
     //     sessionYear,
     //   });
+    //setConvocationMembers(response.data);
     setConvocationMembers(data);
     setFlag(true);
     // } catch (e) {
@@ -61,60 +63,59 @@ export default function ConvocationList() {
   });
 
   return (
+    <Box className="container" style={{ marginLeft: '320px' }}>
     <div className="container">
-      <h1>Session-year</h1>
+      <Typography variant="h4">Session-year</Typography>
       <form onSubmit={Filehandler} className="form">
-        <select value={sessionYear} onChange={e => setSessionYear(e.target.value)}>
-          <option value="2016-2017">2016-2017</option>
-          <option value="2018-2019">2018-2019</option>
-          <option value="2019-2020">2019-2020</option>
-          <option value="2020-2021">2020-2021</option>
-          <option value="2022-2023">2022-2023</option>
-          <option value="2023-2024">2023-2024</option>
-        </select>
-        <button>Submit</button>
+      <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)}>
+          <MenuItem value="2016-2017">2016-2017</MenuItem>
+          <MenuItem value="2018-2019">2018-2019</MenuItem>
+          <MenuItem value="2019-2020">2019-2020</MenuItem>
+          <MenuItem value="2020-2021">2020-2021</MenuItem>
+          <MenuItem value="2022-2023">2022-2023</MenuItem>
+          <MenuItem value="2023-2024">2023-2024</MenuItem>
+    </Select>
+        <Button type="submit" variant="contained">Submit</Button>
       </form>
       {flag && convocationMembers.length > 0 &&
-        <div>
-          <form onChange={ApplyFilter} className="form">
-            <select value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option>cgpa</option>
-              <option>name</option>
-              <option>branch</option>
-              <option>Date</option>
-            </select>
-            <button>Apply filter</button>
+        <Box>
+          <form onSubmit={ApplyFilter} className="form">
+            <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <MenuItem value="cgpa">CGPA</MenuItem>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="branch">Branch</MenuItem>
+              <MenuItem value="Date">Date</MenuItem>
+            </Select>
+            <Button type="submit" variant="contained">Apply filter</Button>
           </form>
-          <input type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} />
-          <div>
-            <div>
+          <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} />
+          <Box>
             {filteredMembers.length > 0 ? (
-              <table className="table">
-                <thead>
-                  <tr>
+              <Table>
+                <TableHead>
+                  <TableRow>
                     {Object.keys(filteredMembers[0]).map((key) => (
-                      <th key={key}>{key}</th>
+                      <TableCell key={key}>{key}</TableCell>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {filteredMembers.map((row, index) => (
-                    <tr key={index}>
+                    <TableRow key={index}>
                       {Object.values(row).map((value, i) => (
-                        <td key={i}>{value}</td>
+                        <TableCell key={i}>{value}</TableCell>
                       ))}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             ) : (
-              <p>No data found</p>
+              <Typography variant="body1">No data found</Typography>
             )}
-            </div>
-
-          </div>
-        </div>
+          </Box>
+        </Box>
       }
     </div>
+    </Box>
   );
 }

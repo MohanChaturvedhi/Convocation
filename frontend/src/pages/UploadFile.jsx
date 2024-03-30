@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import './UploadFile.css'; 
 import axios from 'axios';
+import { Typography, Button, Table, TableHead, TableBody, TableRow, TableCell, Box } from '@mui/material';
 
 const UploadFile = () => {
   const [selectedFile, setSelectedFile] = useState('');
   const [parsedData, setParsedData] = useState('');
   const [showTable, setShowTable] = useState('');
   const [inputKey, setInputKey] = useState(0);
+  // const [sidebarWidth, setSidebarWidth] = useState(320); // Set initial value to 320px
 
   useEffect(() => {
     // Reset key when component unmounts to avoid potential issues
@@ -63,60 +64,56 @@ const UploadFile = () => {
   };
 
   return (
-    <div>
-      <div className="header">
-        <h1>Convocation</h1>
-      </div>
+    <Box className="container" style={{ position: 'absolute', left: '350px', right: '0', display: 'flex', flexDirection: 'column', }}>
+      <Typography variant="h3" align="center" gutterBottom>
+        Convocation
+      </Typography>
 
-      <div className="uploader">
-        <h2>Select CSV Files</h2>
-        <input
-          className="uploader_btn"
-          key={inputKey}
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-        />
-      </div>
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Typography variant="h5">Select CSV File</Typography>
+        <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} />
+      </Box>
 
-      {selectedFile && <button onClick={handleParsePreview}>Preview CSV</button>}
+      {selectedFile && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Button variant="contained" onClick={handleParsePreview}>Preview CSV</Button>
+        </Box>
+      )}
 
       {showTable && parsedData && (
-  <div className="popup">
-    <div className="popup-content">
-      <h3>Data Preview</h3>
-      <div className="table-container"> {/* Add this container */}
-        <table>
-          <thead>
-            <tr>
-              {Object.keys(parsedData[0]).map((key) => (
-                <th key={key}>{key}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {parsedData.map((row, index) => (
-              <tr key={index}>
-                {Object.values(row).map((value, i) => (
-                  <td key={i}>{value}</td>
+        <Box className="popup" display="flex" justifyContent="center" mt={2}>
+          <Box className="popup-content" style={{ display: 'flex', flexDirection: 'column',overflowX:'auto' }}>
+            <Typography variant="h5" gutterBottom>Data Preview</Typography>
+            <Table style={{ flexGrow: 1,width:'100%' }}>
+              <TableHead>
+                <TableRow>
+                  {Object.keys(parsedData[0]).map((key) => (
+                    <TableCell key={key}>{key}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {parsedData.map((row, index) => (
+                  <TableRow key={index}>
+                    {Object.values(row).map((value, i) => (
+                      <TableCell key={i}>{value}</TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <button className="confirm" onClick={handleSubmit}>
-          Confirm
-        </button>
-        <button className="cancel" onClick={handleCancel}>
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-    </div>
+              </TableBody>
+            </Table>
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Button variant="contained" color="primary" onClick={handleSubmit}>
+                Confirm
+              </Button>
+              <Button variant="contained" color="error" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 };
 

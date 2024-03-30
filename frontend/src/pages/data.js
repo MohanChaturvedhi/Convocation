@@ -58,5 +58,59 @@ export const data=[
         "name":"gyanesh",
         "Date":"12-11-2022",
         "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
+    },
+    {
+        "cgpa":0.0,
+        "name":"gyanesh",
+        "Date":"12-11-2022",
+        "branch":"CHE",
     }
 ]
