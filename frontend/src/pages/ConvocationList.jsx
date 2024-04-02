@@ -157,8 +157,8 @@ export default function ConvocationList() {
             <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height:'3rem' }} />
           </Box>
         }
-        <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' ,overflowX:'auto'}}>
-          {currentItems.length > 0 ? (
+        {currentItems.length > 0 && ( // Conditionally render download button
+          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' ,overflowX:'auto'}}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -177,10 +177,8 @@ export default function ConvocationList() {
                 ))}
               </TableBody>
             </Table>
-          ) : (
-            <Typography variant="body1">No data found</Typography>
-          )}
-        </Box>
+          </Box>
+        )}
         {filteredMembers.length > itemsPerPage && (
           <Box mt={2} display="flex" justifyContent="center">
             <Button disabled={currentPage === 1} onClick={() => handlePagination(currentPage - 1)} sx={{ marginX: 1 }}>Previous</Button>
@@ -194,9 +192,11 @@ export default function ConvocationList() {
             <Button disabled={currentPage === totalPages} onClick={() => handlePagination(currentPage + 1)} sx={{ marginX: 1 }}>Next</Button>
           </Box>
         )}
-        <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
-          <Button onClick={downloadData} variant="contained" sx={{ bgcolor: '#42a5f5', color: '#fff', transition: 'background-color 0.2s ease-in-out' }}>Download</Button>
-        </Box>
+        {currentItems.length > 0 && ( // Conditionally render download button
+          <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
+            <Button onClick={downloadData} variant="contained" sx={{ bgcolor: '#42a5f5', color: '#fff', transition: 'background-color 0.2s ease-in-out' }}>Download</Button>
+          </Box>
+        )}
       </div>
     </Box>
   );
