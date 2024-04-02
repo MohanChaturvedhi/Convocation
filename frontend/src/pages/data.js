@@ -8,7 +8,7 @@ export const data=[
     },
     {
         "cgpa":8.0,
-        "name":"Anvith",
+        "name":"An-vith",
         "Date":"29-01-2022",
         "branch":"IT",
         "company":"Amazon",

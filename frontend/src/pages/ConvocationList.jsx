@@ -54,6 +54,43 @@ export default function ConvocationList() {
     setOrder(e.target.value);
   };
 
+  const downloadData = () => {
+    // Create CSV content with column headings
+    const headers = Object.keys(convocationMembers[0]);
+    const rows = convocationMembers.map(row => {
+      // Convert the date format if the field is 'Date'
+      return headers.map(header => {
+        if (header === 'Date') {
+          // Convert 'YYYY-MM-DD' to 'MM/DD/YYYY' format
+          const [year, month, day] = row[header].split('-');
+          return `${month}/${day}/${year}`;
+        }
+        return row[header];
+      });
+    });
+  
+    // Combine headers and rows into CSV content
+    const csvContent =
+      headers.join(',') + '\n' +
+      rows.map(row => row.join(',')).join('\n');
+  
+    // Create a blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+    // Create a temporary anchor element to trigger the download
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.setAttribute('download', 'convocation_data.csv');
+    link.style.visibility = 'hidden';
+  
+    // Append the anchor to the body and trigger the download
+    document.body.appendChild(link);
+    link.click();
+  
+    // Clean up
+    document.body.removeChild(link);
+  };
+
   const filteredMembers = convocationMembers.filter((member) => {
     const searchText = searchItem.toLowerCase();
     return (
@@ -148,11 +185,18 @@ export default function ConvocationList() {
           <Box mt={2} display="flex" justifyContent="center">
             <Button disabled={currentPage === 1} onClick={() => handlePagination(currentPage - 1)} sx={{ marginX: 1 }}>Previous</Button>
             {paginationItems.map((item, index) => (
-              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1 }}>{item}</Button>
+              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1 ,
+                bgcolor: currentPage === item ? '#42a5f5' : 'transparent',
+                color: currentPage === item ? '#fff' : 'inherit',
+                transition: 'background-color 0.2s ease-in-out',
+              }}>{item}</Button>
             ))}
             <Button disabled={currentPage === totalPages} onClick={() => handlePagination(currentPage + 1)} sx={{ marginX: 1 }}>Next</Button>
           </Box>
         )}
+        <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
+          <Button onClick={downloadData} variant="contained" sx={{ bgcolor: '#42a5f5', color: '#fff', transition: 'background-color 0.2s ease-in-out' }}>Download</Button>
+        </Box>
       </div>
     </Box>
   );

@@ -97,7 +97,9 @@ const UploadFile = () => {
             key={index}
             onClick={() => handlePagination(page)}
             variant="outlined"
-            sx={{ marginX: 1, color: currentPage === page ? 'primary.main' : 'text.primary', bgcolor: currentPage === page ? 'primary.light' : 'transparent' }}
+            sx={{ marginX: 1, color: currentPage === page ? 'primary.main' : 'text.primary', bgcolor: currentPage === page ? 'primary.light' : 'transparent' ,
+            transition: 'background-color 0.2s ease-in-out',
+          }}
           >
             {page}
           </Button>
@@ -119,7 +121,7 @@ const UploadFile = () => {
 
       <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
         <Typography variant="h5">Select CSV File</Typography>
-        <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} />
+        <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} sx={{marginX:'40'}} />
       </Box>
 
       {selectedFile && (
