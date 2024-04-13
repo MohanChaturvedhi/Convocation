@@ -112,7 +112,7 @@ const UploadFile = () => {
 
 
   return (
-    <Box className="container" style={{ position: 'absolute', left: '320px', right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
+    <Box className="container" style={{ position: 'absolute', left: '270px', right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
       <Box style={{ background: '#3f51b5', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
         <Typography variant="h3" align="center" gutterBottom style={{ color: '#fff' }}>
           Convocation
@@ -121,7 +121,7 @@ const UploadFile = () => {
 
       <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
         <Typography variant="h5">Select CSV File</Typography>
-        <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} sx={{marginX:'40'}} />
+        <input key={inputKey} type="file" accept=".csv" onChange={handleFileChange} />
       </Box>
 
       {selectedFile && (
@@ -153,25 +153,27 @@ const UploadFile = () => {
                   ))}
                 </TableBody>
               </Table>
-              <Box display="flex" justifyContent="space-between" mt={2} alignItems="center">
-                <Box>
-                  <Button variant="contained" color="error" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </Box>
-                <Box>
-                  <Button variant="contained" color="success" onClick={handleSubmit}>
-                    Confirm
-                  </Button>
-                </Box>
-              </Box>
-              {totalPages > 1 && (
-                <Box mt={2} display="flex" justifyContent="center">
-                  {renderPagination()}
-                </Box>
-              )}
             </Box>
           </Fade>
+        </Box>
+      )}
+      {selectedFile && showTable && (
+        <Box display="flex" justifyContent="space-between" mt={2} alignItems="center">
+          <Box>
+            <Button variant="contained" color="error" onClick={handleCancel}>
+              Cancel
+            </Button>
+          </Box>
+          <Box>
+            <Button variant="contained" color="success" onClick={handleSubmit}>
+              Confirm
+            </Button>
+          </Box>
+        </Box>
+      )}
+      {totalPages > 1 && (
+        <Box mt={2} display="flex" justifyContent="center">
+          {renderPagination()}
         </Box>
       )}
     </Box>

@@ -1,21 +1,43 @@
 import React, { useState } from 'react';
-import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem } from '@mui/material';
-import { data } from './data.js'; // Mock data for development (optional)
+import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem ,Modal} from '@mui/material';
+import { data } from './data.js'; 
 
-export default function ConvocationList() {
-  const [sessionYear, setSessionYear] = useState('2016-2017');
+export default function ConvocationList({Mleft}) {
+  const [sessionYear, setSessionYear] = useState('2011-2012');
   const [convocationMembers, setConvocationMembers] = useState([]);
   const [flag, setFlag] = useState(false);
   const [sort, setSort] = useState('name');
   const [order, setOrder] = useState('asc');
   const [searchItem, setSearchItem] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  // const [sidebarWidth, setSidebarWidth] = useState(270);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+const [editModalOpen, setEditModalOpen] = useState(false);
+
+
   const itemsPerPage = 15;
 
   const Filehandler = (e) => {
     e.preventDefault();
-    setConvocationMembers(data); // Replace with actual data fetching
+    setConvocationMembers(data);
     setFlag(true);
+    setIsSubmitted(true);
+  };
+
+  const handleDelete = (item) => {
+    setConvocationMembers(convocationMembers.filter(member => member !== item));
+  };
+  
+  const handleEdit = (item) => {
+    setEditItem(item);
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = (e, updatedItem) => {
+    e.preventDefault();
+    setConvocationMembers(convocationMembers.map(member => member === editItem ? updatedItem : member));
+    setEditModalOpen(false);
   };
 
   const ApplyFilter = (e) => {
@@ -55,38 +77,27 @@ export default function ConvocationList() {
   };
 
   const downloadData = () => {
-    // Create CSV content with column headings
     const headers = Object.keys(convocationMembers[0]);
     const rows = convocationMembers.map(row => {
-      // Convert the date format if the field is 'Date'
       return headers.map(header => {
         if (header === 'Date') {
-          // Convert 'YYYY-MM-DD' to 'MM/DD/YYYY' format
           const [year, month, day] = row[header].split('-');
           return `${month}/${day}/${year}`;
         }
         return row[header];
       });
     });
-  
-    // Combine headers and rows into CSV content
     const csvContent =
       headers.join(',') + '\n' +
       rows.map(row => row.join(',')).join('\n');
-  
-    // Create a blob with the CSV content
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  
-    // Create a temporary anchor element to trigger the download
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
     link.setAttribute('download', 'convocation_data.csv');
     link.style.visibility = 'hidden';
-  
-    // Append the anchor to the body and trigger the download
     document.body.appendChild(link);
     link.click();
-  
+
     // Clean up
     document.body.removeChild(link);
   };
@@ -123,12 +134,18 @@ export default function ConvocationList() {
   }
 
   return (
-    <Box className="container" style={{ marginLeft: '270px', marginRight:'15px' }}>
+    <Box className="container" style={{ marginLeft: `${Mleft}px`, marginRight: '15px', flex: 1 }}>
       <div className="container">
-        <Box display="flex" flexDirection="column" alignItems="center">
+      {!isSubmitted && (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" flex="1">
           <Typography variant="h4" mb={2}>Session-year</Typography>
           <form onSubmit={Filehandler} className="form" style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem',height:'3rem' }}>
+            <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem', height: '3rem' }}>
+              <MenuItem value="2011-2012">2011-2012</MenuItem>
+              <MenuItem value="2012-2013">2012-2013</MenuItem>
+              <MenuItem value="2013-2015">2013-2015</MenuItem>
+              <MenuItem value="2014-2015">2014-2015</MenuItem>
+              <MenuItem value="2015-2016">2015-2016</MenuItem>
               <MenuItem value="2016-2017">2016-2017</MenuItem>
               <MenuItem value="2018-2019">2018-2019</MenuItem>
               <MenuItem value="2019-2020">2019-2020</MenuItem>
@@ -136,65 +153,89 @@ export default function ConvocationList() {
               <MenuItem value="2022-2023">2022-2023</MenuItem>
               <MenuItem value="2023-2024">2023-2024</MenuItem>
             </Select>
-            <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', height:'3rem'}}>Submit</Button>
+            <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', height: '3rem' }}>Submit</Button>
           </form>
         </Box>
+        )}
         {flag && convocationMembers.length > 0 &&
           <Box mt={2} display="flex" alignItems="center">
             <form onSubmit={ApplyFilter} className="form">
-              <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', height:'3rem' }}>
+              <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', height: '3rem' }}>
                 <MenuItem value="cgpa" sx={{ fontSize: '1rem' }}>CGPA</MenuItem>
                 <MenuItem value="name" sx={{ fontSize: '1rem' }}>Name</MenuItem>
                 <MenuItem value="branch" sx={{ fontSize: '1rem' }}>Branch</MenuItem>
                 <MenuItem value="Date" sx={{ fontSize: '1rem' }}>Date</MenuItem>
               </Select>
-              <Select value={order} onChange={handleOrderChange} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', marginLeft: '8px' , height:'3rem'}}>
+              <Select value={order} onChange={handleOrderChange} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', marginLeft: '8px', height: '3rem' }}>
                 <MenuItem value="asc" sx={{ fontSize: '1rem' }}>Ascending</MenuItem>
                 <MenuItem value="desc" sx={{ fontSize: '1rem' }}>Descending</MenuItem>
               </Select>
-              <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', marginLeft: '8px', height:'3rem' }}>Apply filter</Button>
+              <Button type="submit"  sx={{ fontSize: '1rem',bgcolor: '#9155FD', padding: '8px 16px', marginLeft: '8px', height: '3rem', color: '#fff' }}>Apply filter</Button>
             </form>
-            <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height:'3rem' }} />
+            <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height: '3rem' }} />
           </Box>
         }
-        {currentItems.length > 0 && ( // Conditionally render download button
-          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' ,overflowX:'auto'}}>
+        {currentItems.length > 0 && (
+          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out', overflowX: 'auto' }}>
             <Table>
               <TableHead>
                 <TableRow>
                   {Object.keys(currentItems[0]).map((key) => (
-                    <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem' }}>{key}</TableCell>
+                    <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>{key}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {currentItems.map((row, index) => (
-                  <TableRow key={index}>
-                    {Object.keys(currentItems[0]).map((key) => (
-                      <TableCell key={key}>{row[key] || '---'}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
+                  {currentItems.map((row, index) => (
+                   <TableRow key={index}>
+      {Object.keys(currentItems[0]).map((key) => (
+        <TableCell key={key}>{row[key] || '---'}</TableCell>
+      ))}
+      <TableCell>
+        <Button onClick={() => handleEdit(row)}>Edit</Button>
+        <Button onClick={() => handleDelete(row)}>Delete</Button>
+        {editModalOpen && (
+  <Modal 
+    open={editModalOpen} 
+    onClose={() => setEditModalOpen(false)}
+    style={{backgroundColor: 'white'}}
+  >
+    <form onSubmit={handleEditSubmit} style={{border: '1px solid black', fontSize: '16px', color: 'black'}}>
+      {Object.keys(editItem).map((key) => (
+        <TextField 
+          key={key}
+          label={key}
+          value={editItem[key]}
+          onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
+          style={{margin: '10px'}}
+        />
+      ))}
+      <Button type="submit">Submit</Button>
+      <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+    </form>
+  </Modal>
+)}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
             </Table>
           </Box>
         )}
         {filteredMembers.length > itemsPerPage && (
           <Box mt={2} display="flex" justifyContent="center">
-            <Button disabled={currentPage === 1} onClick={() => handlePagination(currentPage - 1)} sx={{ marginX: 1 }}>Previous</Button>
             {paginationItems.map((item, index) => (
-              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1 ,
+              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1,
                 bgcolor: currentPage === item ? '#42a5f5' : 'transparent',
                 color: currentPage === item ? '#fff' : 'inherit',
                 transition: 'background-color 0.2s ease-in-out',
               }}>{item}</Button>
             ))}
-            <Button disabled={currentPage === totalPages} onClick={() => handlePagination(currentPage + 1)} sx={{ marginX: 1 }}>Next</Button>
           </Box>
         )}
-        {currentItems.length > 0 && ( // Conditionally render download button
+        {currentItems.length > 0 && (
           <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
-            <Button onClick={downloadData} variant="contained" sx={{ bgcolor: '#42a5f5', color: '#fff', transition: 'background-color 0.2s ease-in-out' }}>Download</Button>
+            <Button onClick={downloadData} variant="contained" sx={{ bgcolor: '#9155FD', color: '#fff', transition: 'background-color 0.2s ease-in-out' }}>Download</Button>
           </Box>
         )}
       </div>
