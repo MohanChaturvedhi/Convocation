@@ -1,16 +1,16 @@
 import React from 'react';
 import { Typography, Button, Box } from '@mui/material';
 
-const Dashboard = () => {
+const Dashboard = ({ Mleft }) => {
   return (
     <Box
       sx={{
         position: 'absolute',
         top: '50%',
-        left: '50%',
+        left: `calc(50% + ${Mleft}px)`,
         transform: 'translate(-50%, -50%)',
         textAlign: 'center',
-        width: '80%',
+        width: '60%',
         maxWidth: 600,
         padding: 4,
         backgroundColor: 'rgba(0, 0, 255, 0.1)',

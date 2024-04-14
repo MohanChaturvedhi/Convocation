@@ -1,3 +1,4 @@
+// App.js
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/system';
@@ -16,9 +17,9 @@ const App = () => {
       <Sidebar ChangeMargin={ChangeMargin} />
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         <Routes>
-          <Route exact path="/" element={<Dashboard />} /> 
-          <Route exact path="/upload" element={<UploadFile />} />
-          <Route exact path="/convocationlist" element={<ConvocationList Mleft={marginLeft}/>} />
+          <Route exact path="/" element={<Dashboard Mleft={marginLeft} />} /> 
+          <Route exact path="/upload" element={<UploadFile Mleft={marginLeft} />} />
+          <Route exact path="/convocationlist" element={<ConvocationList Mleft={marginLeft} />} />
         </Routes>
       </Box>
     </Box>

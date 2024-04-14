@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
-import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem ,Modal} from '@mui/material';
+import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem, Modal, IconButton } from '@mui/material';
 import { data } from './data.js'; 
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material'; // Import arrow icons
 
 export default function ConvocationList({Mleft}) {
   const [sessionYear, setSessionYear] = useState('2011-2012');
   const [convocationMembers, setConvocationMembers] = useState([]);
   const [flag, setFlag] = useState(false);
-  const [sort, setSort] = useState('name');
-  const [order, setOrder] = useState('asc');
   const [searchItem, setSearchItem] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  // const [sidebarWidth, setSidebarWidth] = useState(270);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [editItem, setEditItem] = useState(null);
-const [editModalOpen, setEditModalOpen] = useState(false);
-
-
-  const itemsPerPage = 15;
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [sort, setSort] = useState({ field: 'name', order: 'asc' }); 
+  const itemsPerPage = 25;
 
   const Filehandler = (e) => {
     e.preventDefault();
@@ -40,28 +37,14 @@ const [editModalOpen, setEditModalOpen] = useState(false);
     setEditModalOpen(false);
   };
 
-  const ApplyFilter = (e) => {
-    e.preventDefault();
-    let temp = [...convocationMembers];
-    if (sort === 'name') {
-      temp.sort((a, b) => order === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
-    } else if (sort === 'branch') {
-      temp.sort((a, b) => order === 'asc' ? a.branch.localeCompare(b.branch) : b.branch.localeCompare(a.branch));
-    } else if (sort === 'Date') {
-      temp.sort((a, b) => {
-        const dateA = a.Date.split("-");
-        const dateB = b.Date.split("-");
-        const yearComparison = dateA[0] - dateB[0];
-        if (yearComparison !== 0) {
-          return order === 'asc' ? yearComparison : -yearComparison;
-        } else {
-          return order === 'asc' ? dateA[1] - dateB[1] : dateB[1] - dateA[1];
-        }
-      });
+  const handleSort = (field) => {
+    let newOrder;
+    if (field === 'Date') {
+      newOrder = sort.field === field && sort.order === 'asc' ? 'desc' : 'asc';
     } else {
-      temp.sort((a, b) => order === 'asc' ? a.cgpa - b.cgpa : b.cgpa - a.cgpa);
+      newOrder = sort.field === field && sort.order === 'asc' ? 'desc' : 'asc';
     }
-    setConvocationMembers(temp);
+    setSort({ field, order: newOrder });
   };
 
   const SearchFilter = (e) => {
@@ -70,10 +53,6 @@ const [editModalOpen, setEditModalOpen] = useState(false);
 
   const handlePagination = (pageNumber) => {
     setCurrentPage(pageNumber);
-  };
-
-  const handleOrderChange = (e) => {
-    setOrder(e.target.value);
   };
 
   const downloadData = () => {
@@ -97,18 +76,33 @@ const [editModalOpen, setEditModalOpen] = useState(false);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
-
-    // Clean up
     document.body.removeChild(link);
   };
 
-  const filteredMembers = convocationMembers.filter((member) => {
+  const sortedMembers = [...convocationMembers].sort((a, b) => {
+    const comparison = sort.order === 'asc' ? 1 : -1;
+    return comparison * (String(a[sort.field]).localeCompare(String(b[sort.field])));
+  });
+
+  const filteredMembers = sortedMembers.filter((member) => {
     const searchText = searchItem.toLowerCase();
     return (
-      member.name.toLowerCase().includes(searchText) ||
-      member.branch.toLowerCase().includes(searchText) ||
-      member.Date.toLowerCase().includes(searchText) ||
-      member.cgpa.toString().includes(searchText)
+      (member.sl_no && member.sl_no.toString().toLowerCase().includes(searchText)) ||
+      (member.certificate_no && member.certificate_no.toString().toLowerCase().includes(searchText)) ||
+      (member.admn_no && member.admn_no.toString().toLowerCase().includes(searchText)) ||
+      (member.name && member.name.toString().toLowerCase().includes(searchText)) ||
+      (member.course && member.course.toString().toLowerCase().includes(searchText)) ||
+      (member.branch && member.branch.toString().toLowerCase().includes(searchText)) ||
+      (member.ogpa && member.ogpa.toString().toLowerCase().includes(searchText)) ||
+      (member.ogpa_h && member.ogpa_h.toString().toLowerCase().includes(searchText)) ||
+      (member.final_ogpa && member.final_ogpa.toString().toLowerCase().includes(searchText)) ||
+      (member.division && member.division.toString().toLowerCase().includes(searchText)) ||
+      (member.date_of_result && member.date_of_result.toString().toLowerCase().includes(searchText)) ||
+      (member.yop && member.yop.toString().toLowerCase().includes(searchText)) ||
+      (member.dept_id && member.dept_id.toString().toLowerCase().includes(searchText)) ||
+      (member.course_id && member.course_id.toString().toLowerCase().includes(searchText)) ||
+      (member.branch_id && member.branch_id.toString().toLowerCase().includes(searchText)) ||
+      (member.deptnm && member.deptnm.toString().toLowerCase().includes(searchText))
     );
   });
 
@@ -136,90 +130,97 @@ const [editModalOpen, setEditModalOpen] = useState(false);
   return (
     <Box className="container" style={{ marginLeft: `${Mleft}px`, marginRight: '15px', flex: 1 }}>
       <div className="container">
-      {!isSubmitted && (
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" flex="1">
-          <Typography variant="h4" mb={2}>Session-year</Typography>
-          <form onSubmit={Filehandler} className="form" style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem', height: '3rem' }}>
-              <MenuItem value="2011-2012">2011-2012</MenuItem>
-              <MenuItem value="2012-2013">2012-2013</MenuItem>
-              <MenuItem value="2013-2015">2013-2015</MenuItem>
-              <MenuItem value="2014-2015">2014-2015</MenuItem>
-              <MenuItem value="2015-2016">2015-2016</MenuItem>
-              <MenuItem value="2016-2017">2016-2017</MenuItem>
-              <MenuItem value="2018-2019">2018-2019</MenuItem>
-              <MenuItem value="2019-2020">2019-2020</MenuItem>
-              <MenuItem value="2020-2021">2020-2021</MenuItem>
-              <MenuItem value="2022-2023">2022-2023</MenuItem>
-              <MenuItem value="2023-2024">2023-2024</MenuItem>
-            </Select>
-            <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', height: '3rem' }}>Submit</Button>
-          </form>
-        </Box>
-        )}
-        {flag && convocationMembers.length > 0 &&
-          <Box mt={2} display="flex" alignItems="center">
-            <form onSubmit={ApplyFilter} className="form">
-              <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', height: '3rem' }}>
-                <MenuItem value="cgpa" sx={{ fontSize: '1rem' }}>CGPA</MenuItem>
-                <MenuItem value="name" sx={{ fontSize: '1rem' }}>Name</MenuItem>
-                <MenuItem value="branch" sx={{ fontSize: '1rem' }}>Branch</MenuItem>
-                <MenuItem value="Date" sx={{ fontSize: '1rem' }}>Date</MenuItem>
+        {!isSubmitted && (
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" flex="1">
+            <Typography variant="h4" mb={2}>Session-year</Typography>
+            <form onSubmit={Filehandler} className="form" style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+              <Select value={sessionYear} onChange={e => setSessionYear(e.target.value)} sx={{ width: '150px', marginRight: '8px', fontSize: '1rem', height: '3rem' }}>
+                <MenuItem value="2011-2012">2011-2012</MenuItem>
+                <MenuItem value="2012-2013">2012-2013</MenuItem>
+                <MenuItem value="2013-2015">2013-2015</MenuItem>
+                <MenuItem value="2014-2015">2014-2015</MenuItem>
+                <MenuItem value="2015-2016">2015-2016</MenuItem>
+                <MenuItem value="2016-2017">2016-2017</MenuItem>
+                <MenuItem value="2018-2019">2018-2019</MenuItem>
+                <MenuItem value="2019-2020">2019-2020</MenuItem>
+                <MenuItem value="2020-2021">2020-2021</MenuItem>
+                <MenuItem value="2022-2023">2022-2023</MenuItem>
+                <MenuItem value="2023-2024">2023-2024</MenuItem>
               </Select>
-              <Select value={order} onChange={handleOrderChange} sx={{ width: '150px', fontSize: '1rem', padding: '8px 16px', marginLeft: '8px', height: '3rem' }}>
-                <MenuItem value="asc" sx={{ fontSize: '1rem' }}>Ascending</MenuItem>
-                <MenuItem value="desc" sx={{ fontSize: '1rem' }}>Descending</MenuItem>
-              </Select>
-              <Button type="submit"  sx={{ fontSize: '1rem',bgcolor: '#9155FD', padding: '8px 16px', marginLeft: '8px', height: '3rem', color: '#fff' }}>Apply filter</Button>
+              <Button type="submit" variant="contained" sx={{ fontSize: '1rem', padding: '8px 16px', height: '3rem' }}>Submit</Button>
             </form>
+          </Box>
+        )}
+     {flag && (
+  <Box sx={{ position: 'relative', zIndex: 2, transition: 'opacity 0.3s ease-in-out', padding: '10px', borderRadius: '5px', marginTop: '10px' }}>
+  <Typography variant="body1" sx={{ padding: '5px', borderRadius: '5px' }}>
+    <span style={{ backgroundColor: '#9155FD', color: '#fff', padding: '10px', borderRadius: '15px' }}>
+    Academic Session: {sessionYear}
+    </span>
+  </Typography>
+</Box>
+)}
+
+        {flag && convocationMembers.length > 0 && (
+          <Box mt={2} display="flex" alignItems="center">
             <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height: '3rem' }} />
           </Box>
-        }
+        )}
         {currentItems.length > 0 && (
-          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out', overflowX: 'auto' }}>
-            <Table>
-              <TableHead>
-                <TableRow>
+          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out', overflowX: 'auto',overflowY: 'auto' }}>
+            <Table sx={{ display: 'block', overflow: 'auto', maxHeight: '750px' }}>
+             <TableHead component="div">
+                 <TableRow component="div">
                   {Object.keys(currentItems[0]).map((key) => (
-                    <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>{key}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                  {currentItems.map((row, index) => (
-                   <TableRow key={index}>
-      {Object.keys(currentItems[0]).map((key) => (
-        <TableCell key={key}>{row[key] || '---'}</TableCell>
+                   <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>
+                    <Box display="flex" alignItems="center">
+                    {key}
+                    {key !== 'Actions' && (
+                    <IconButton size="small" onClick={() => handleSort(key)}>
+                     {sort.field === key && sort.order === 'asc' ? <ArrowUpward /> : <ArrowDownward />}
+               </IconButton>                    
+          )}
+          </Box>
+        </TableCell>
       ))}
-      <TableCell>
-        <Button onClick={() => handleEdit(row)}>Edit</Button>
-        <Button onClick={() => handleDelete(row)}>Delete</Button>
-        {editModalOpen && (
-  <Modal 
-    open={editModalOpen} 
-    onClose={() => setEditModalOpen(false)}
-    style={{backgroundColor: 'white'}}
-  >
-    <form onSubmit={handleEditSubmit} style={{border: '1px solid black', fontSize: '16px', color: 'black'}}>
-      {Object.keys(editItem).map((key) => (
-        <TextField 
-          key={key}
-          label={key}
-          value={editItem[key]}
-          onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
-          style={{margin: '10px'}}
-        />
-      ))}
-      <Button type="submit">Submit</Button>
-      <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
-    </form>
-  </Modal>
-)}
-      </TableCell>
+      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>Actions</TableCell>
     </TableRow>
-  ))}
-</TableBody>
-            </Table>
+  </TableHead>
+  <TableBody component="div">
+    {currentItems.map((row, index) => (
+      <TableRow key={index} component="div">
+        {Object.keys(currentItems[0]).map((key) => (
+          <TableCell key={key}>{row[key] || '---'}</TableCell>
+        ))}
+        <TableCell>
+          <Button color="primary" onClick={() => handleEdit(row)}>Edit</Button>
+          <Button color="secondary" onClick={() => handleDelete(row)}>Delete</Button>
+          {editModalOpen && (
+            <Modal 
+              open={editModalOpen} 
+              onClose={() => setEditModalOpen(false)}
+              style={{backgroundColor: 'white'}}
+            >
+              <form onSubmit={(e) => handleEditSubmit(e, editItem)} style={{border: '1px solid black', fontSize: '16px', color: 'black'}}>
+                {Object.keys(editItem).map((key) => (
+                  <TextField 
+                    key={key}
+                    label={key}
+                    value={editItem[key]}
+                    onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
+                    style={{margin: '10px'}}
+                  />
+                ))}
+                <Button type="submit">Submit</Button>
+                <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+              </form>
+            </Modal>
+          )}
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
           </Box>
         )}
         {filteredMembers.length > itemsPerPage && (

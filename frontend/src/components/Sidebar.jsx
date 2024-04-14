@@ -19,7 +19,7 @@ const Sidebar = ({ ChangeMargin }) => {
   };
 
   useEffect(() => {
-    ChangeMargin(isLargeScreen ? 270 : 40);
+    ChangeMargin(isLargeScreen ? 300 : 20);
   }, [isLargeScreen, ChangeMargin]);
 
   const drawer = (
