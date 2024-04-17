@@ -5,7 +5,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ListIcon from '@mui/icons-material/List';
 import MenuIcon from '@mui/icons-material/Menu';
-
 const Sidebar = ({ ChangeMargin }) => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [open, setOpen] = useState(false);
@@ -92,5 +91,4 @@ const Sidebar = ({ ChangeMargin }) => {
     </div>
   );
 };
-
 export default Sidebar;
