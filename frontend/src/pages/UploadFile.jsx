@@ -132,7 +132,7 @@ const UploadFile = () => {
   };
 
   return (
-    <Box className="container" style={{ position: 'absolute', left: isMobile ? '75px' : 250, right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
+    <Box className="container" style={{ position: 'absolute', left: isMobile ? '40px' : 280, right: '0', display: 'flex', flexDirection: 'column', padding: '20px' }}>
       <Box style={{ background: '#3f51b5', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
         <Typography variant="h3" align="center" gutterBottom style={{ color: '#fff' }}>
           Convocation

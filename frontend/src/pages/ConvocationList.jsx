@@ -284,7 +284,7 @@ export default function ConvocationList() {
             </Table>
 
           ) : (
-            <Box mt={2} display="flex" justifyContent="center">
+            <Box mt={2} display="flex" justifyContent="center" >
             <Typography variant="body1">No data found</Typography>
             </Box>
           )}
