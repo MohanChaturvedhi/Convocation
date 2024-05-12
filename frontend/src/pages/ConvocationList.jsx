@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem, Modal, IconButton } from '@mui/material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { data } from './data.js'; 
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material'; // Import arrow icons
 
-export default function ConvocationList({Mleft}) {
+export default function ConvocationList({ Mleft }) {
   const [sessionYear, setSessionYear] = useState('2011-2012');
   const [convocationMembers, setConvocationMembers] = useState([]);
   const [flag, setFlag] = useState(false);
@@ -12,7 +12,10 @@ export default function ConvocationList({Mleft}) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [sort, setSort] = useState({ field: 'name', order: 'asc' }); 
+  const [sort, setSort] = useState({ field: 'name', order: 'asc' });
+  const [editMode, setEditMode] = useState(false); 
+  const [editIndex, setEditIndex] = useState(null); 
+  const [editedItem, setEditedItem] = useState({}); 
   const itemsPerPage = 25;
 
   const Filehandler = (e) => {
@@ -25,16 +28,23 @@ export default function ConvocationList({Mleft}) {
   const handleDelete = (item) => {
     setConvocationMembers(convocationMembers.filter(member => member !== item));
   };
-  
-  const handleEdit = (item) => {
+
+  const handleEdit = (item,index) => {
     setEditItem(item);
+    setEditIndex(index);
+    setEditedItem(item);
     setEditModalOpen(true);
   };
 
   const handleEditSubmit = (e, updatedItem) => {
     e.preventDefault();
-    setConvocationMembers(convocationMembers.map(member => member === editItem ? updatedItem : member));
+    const updatedMembers = [...convocationMembers];
+    updatedMembers[editIndex] = editedItem;
+    setConvocationMembers(updatedMembers);
     setEditModalOpen(false);
+    setEditMode(false); // Step 3: Disable edit mode after saving
+    setEditIndex(null);
+    setEditedItem({});
   };
 
   const handleSort = (field) => {
@@ -151,87 +161,91 @@ export default function ConvocationList({Mleft}) {
             </form>
           </Box>
         )}
-     {flag && (
-  <Box sx={{ position: 'relative', zIndex: 2, transition: 'opacity 0.3s ease-in-out', padding: '10px', borderRadius: '5px', marginTop: '10px' }}>
-  <Typography variant="body1" sx={{ padding: '5px', borderRadius: '5px' }}>
-    <span style={{ backgroundColor: '#9155FD', color: '#fff', padding: '10px', borderRadius: '15px' }}>
-    Academic Session: {sessionYear}
-    </span>
-  </Typography>
-</Box>
-)}
+        {flag && (
+          <Box sx={{ position: 'relative', zIndex: 2, transition: 'opacity 0.3s ease-in-out', padding: '10px', borderRadius: '5px', marginTop: '10px', boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)' }}>
+            <Typography variant="body1" sx={{ padding: '5px', borderRadius: '5px' }}>
+              <span style={{ backgroundColor: '#9155FD', color: '#fff', padding: '10px', borderRadius: '15px' }}>
+                Academic Session: {sessionYear}
+              </span>
+            </Typography>
+          </Box>
+        )}
 
-        {flag && convocationMembers.length > 0 && (
-          <Box mt={2} display="flex" alignItems="center">
-            <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height: '3rem' }} />
-          </Box>
-        )}
-        {currentItems.length > 0 && (
-          <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out', overflowX: 'auto',overflowY: 'auto' }}>
-            <Table sx={{ display: 'block', overflow: 'auto', maxHeight: '750px' }}>
-             <TableHead component="div">
-                 <TableRow component="div">
-                  {Object.keys(currentItems[0]).map((key) => (
-                   <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>
-                    <Box display="flex" alignItems="center">
-                    {key}
-                    {key !== 'Actions' && (
-                    <IconButton size="small" onClick={() => handleSort(key)}>
-                     {sort.field === key && sort.order === 'asc' ? <ArrowUpward /> : <ArrowDownward />}
-               </IconButton>                    
-          )}
-          </Box>
-        </TableCell>
-      ))}
-      <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>Actions</TableCell>
-    </TableRow>
-  </TableHead>
-  <TableBody component="div">
-    {currentItems.map((row, index) => (
-      <TableRow key={index} component="div">
-        {Object.keys(currentItems[0]).map((key) => (
-          <TableCell key={key}>{row[key] || '---'}</TableCell>
-        ))}
-        <TableCell>
-          <Button color="primary" onClick={() => handleEdit(row)}>Edit</Button>
-          <Button color="secondary" onClick={() => handleDelete(row)}>Delete</Button>
-          {editModalOpen && (
-            <Modal 
-              open={editModalOpen} 
-              onClose={() => setEditModalOpen(false)}
-              style={{backgroundColor: 'white'}}
-            >
-              <form onSubmit={(e) => handleEditSubmit(e, editItem)} style={{border: '1px solid black', fontSize: '16px', color: 'black'}}>
-                {Object.keys(editItem).map((key) => (
-                  <TextField 
-                    key={key}
-                    label={key}
-                    value={editItem[key]}
-                    onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
-                    style={{margin: '10px'}}
-                  />
+        {(flag && convocationMembers.length > 0) && (
+          
+          <Box style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out' }}>
+            <Box mt={2} display="flex" alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
+              <TextField type="text" placeholder="Search" value={searchItem} onChange={SearchFilter} sx={{ marginLeft: 'auto', mt: 1, width: '200px', fontSize: '1rem', height: '3rem' }} />
+            </Box>
+
+            <Box mt={2} style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', zIndex: 1, transition: 'box-shadow 0.3s ease-in-out', overflowX: 'auto', overflowY: 'auto' }}>
+              <Table stickyHeader sx={{ display: 'block', overflow: 'auto', maxHeight: '750px' }}>
+                <TableHead component="div">
+                  <TableRow component="div">
+                    {Object.keys(currentItems[0]).map((key) => (
+                      <TableCell key={key} sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>
+                        <Box display="flex" alignItems="center">
+                          {key}
+                          {key !== 'Actions' && (
+                            <IconButton size="small" onClick={() => handleSort(key)}>
+                              {sort.field === key && sort.order === 'asc' ? <ArrowUpward /> : <ArrowDownward />}
+                            </IconButton>
+                          )}
+                        </Box>
+                      </TableCell>
+                    ))}
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '1rem', backgroundColor: 'rgb(103, 119, 239)', color: 'white' }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody component="div">
+                  {currentItems.map((row, index) => (
+                    <TableRow key={index} component="div">
+                      {Object.keys(currentItems[0]).map((key) => (
+                        <TableCell key={key}>{row[key] || '---'}</TableCell>
+                      ))}
+                      <TableCell>
+                        <Button color="primary" onClick={() => handleEdit(row)}>Edit</Button>
+                        <Button color="secondary" onClick={() => handleDelete(row)}>Delete</Button>
+                        {editModalOpen && (
+                          <Modal
+                            open={editModalOpen}
+                            onClose={() => setEditModalOpen(false)}
+                            style={{ backgroundColor: 'white' }}
+                          >
+                            <form onSubmit={(e) => handleEditSubmit(e, editItem)} style={{ border: '1px solid black', fontSize: '16px', color: 'black' }}>
+                              {Object.keys(editItem).map((key) => (
+                                <TextField
+                                  key={key}
+                                  label={key}
+                                  value={editItem[key]}
+                                  onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
+                                  style={{ margin: '10px' }}
+                                />
+                              ))}
+                              <Button type="submit">Submit</Button>
+                              <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+                            </form>
+                          </Modal>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+
+            {filteredMembers.length > itemsPerPage && (
+              <Box mt={2} display="flex" justifyContent="center">
+                {paginationItems.map((item, index) => (
+                  <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{
+                    marginX: 1,
+                    bgcolor: currentPage === item ? '#42a5f5' : 'transparent',
+                    color: currentPage === item ? '#fff' : 'inherit',
+                    transition: 'background-color 0.2s ease-in-out',
+                  }}>{item}</Button>
                 ))}
-                <Button type="submit">Submit</Button>
-                <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
-              </form>
-            </Modal>
-          )}
-        </TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
-          </Box>
-        )}
-        {filteredMembers.length > itemsPerPage && (
-          <Box mt={2} display="flex" justifyContent="center">
-            {paginationItems.map((item, index) => (
-              <Button key={index} onClick={() => handlePagination(item)} variant="outlined" sx={{ marginX: 1,
-                bgcolor: currentPage === item ? '#42a5f5' : 'transparent',
-                color: currentPage === item ? '#fff' : 'inherit',
-                transition: 'background-color 0.2s ease-in-out',
-              }}>{item}</Button>
-            ))}
+              </Box>
+            )}
           </Box>
         )}
         {currentItems.length > 0 && (
