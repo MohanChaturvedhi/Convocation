@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Typography, Select, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell, Box, MenuItem, Modal, IconButton } from '@mui/material';
+import {Typography,Select,Button,TextField,Table,TableHead,TableBody,TableRow,TableCell,Box,MenuItem,Modal,IconButton
+} from '@mui/material';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import { data } from './data.js'; 
+import { data } from './data.js';
 
 export default function ConvocationList({ Mleft }) {
   const [sessionYear, setSessionYear] = useState('2011-2012');
@@ -13,9 +14,9 @@ export default function ConvocationList({ Mleft }) {
   const [editItem, setEditItem] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [sort, setSort] = useState({ field: 'name', order: 'asc' });
-  const [editMode, setEditMode] = useState(false); 
-  const [editIndex, setEditIndex] = useState(null); 
-  const [editedItem, setEditedItem] = useState({}); 
+  const [editMode, setEditMode] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editedItem, setEditedItem] = useState({});
   const itemsPerPage = 25;
 
   const Filehandler = (e) => {
@@ -29,7 +30,7 @@ export default function ConvocationList({ Mleft }) {
     setConvocationMembers(convocationMembers.filter(member => member !== item));
   };
 
-  const handleEdit = (item,index) => {
+  const handleEdit = (item, index) => {
     setEditItem(item);
     setEditIndex(index);
     setEditedItem(item);
@@ -42,7 +43,7 @@ export default function ConvocationList({ Mleft }) {
     updatedMembers[editIndex] = editedItem;
     setConvocationMembers(updatedMembers);
     setEditModalOpen(false);
-    setEditMode(false); // Step 3: Disable edit mode after saving
+    setEditMode(false);
     setEditIndex(null);
     setEditedItem({});
   };
@@ -204,29 +205,8 @@ export default function ConvocationList({ Mleft }) {
                         <TableCell key={key}>{row[key] || '---'}</TableCell>
                       ))}
                       <TableCell>
-                        <Button color="primary" onClick={() => handleEdit(row)}>Edit</Button>
+                        <Button color="primary" onClick={() => handleEdit(row, index)}>Edit</Button>
                         <Button color="secondary" onClick={() => handleDelete(row)}>Delete</Button>
-                        {editModalOpen && (
-                          <Modal
-                            open={editModalOpen}
-                            onClose={() => setEditModalOpen(false)}
-                            style={{ backgroundColor: 'white' }}
-                          >
-                            <form onSubmit={(e) => handleEditSubmit(e, editItem)} style={{ border: '1px solid black', fontSize: '16px', color: 'black' }}>
-                              {Object.keys(editItem).map((key) => (
-                                <TextField
-                                  key={key}
-                                  label={key}
-                                  value={editItem[key]}
-                                  onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
-                                  style={{ margin: '10px' }}
-                                />
-                              ))}
-                              <Button type="submit">Submit</Button>
-                              <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
-                            </form>
-                          </Modal>
-                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -247,6 +227,33 @@ export default function ConvocationList({ Mleft }) {
               </Box>
             )}
           </Box>
+        )}
+        {flag && convocationMembers.length === 0 && (
+          <Typography variant="h6" sx={{ textAlign: 'center', mt: 2 }}>No Data Found</Typography>
+        )}
+        {editModalOpen && (
+          <Modal
+            open={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Box component="form" onSubmit={(e) => handleEditSubmit(e, editItem)} sx={{ border: '1px solid black', padding: 2, backgroundColor: 'white', borderRadius: 1 }}>
+              {Object.keys(editItem).map((key) => (
+                <TextField
+                  key={key}
+                  label={key}
+                  value={editItem[key]}
+                  onChange={(e) => setEditItem({ ...editItem, [key]: e.target.value })}
+                  fullWidth
+                  margin="normal"
+                />
+              ))}
+              <Box mt={2} display="flex" justifyContent="space-between">
+                <Button type="submit" variant="contained">Submit</Button>
+                <Button onClick={() => setEditModalOpen(false)} variant="outlined">Cancel</Button>
+              </Box>
+            </Box>
+          </Modal>
         )}
         {currentItems.length > 0 && (
           <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
